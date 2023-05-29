@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel administratora</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/elephant_icon.css">
+
+    <link rel="manifest" href="/manifest.json">
+
+    <meta name="theme-color" content="#0d6efd" />
+
+    <meta name="robots" content="noindex">
+
+    <link rel="apple-touch-icon" href="/static/img/maskable_icons/maskable_icon_x192.png" />
+
+    <script>
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.querySelector('html').setAttribute('data-bs-theme', 'dark');
+        }
+    </script>
+</head>
+
+<body class="body-margin">
+    <div class="bg-primary text-white p-1 menu">
+        <div class="float-start mt-1 ms-1">
+            <a href="/">
+                <svg id="main-site-link-icon" fill="white" height="35px" width="35px"></svg>
+            </a>
+            <script>
+                fetch('/static/img/admin_icon2.txt')
+                    .then(function (response) { return response.text(); })
+                    .then(function (r) {
+                        document.querySelector('#main-site-link-icon').innerHTML = r;
+                    });
+            </script>
+        </div>
+        <div class="profile-info">
+            <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/core.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/md5.js"></script>
+            <img id="profile-picture" class="d-inline" alt="Zdjęcie profilowe">
+            <script>
+                document.querySelector('#profile-picture').src = `https://www.gravatar.com/avatar/${CryptoJS.MD5('{{ current_user.email }}')}?d=mp`;
+            </script>
+            <p class="d-inline fs-5 ms-1"><a href="/account" class="link-body-emphasis link-underline-opacity-0">
+                    {{ current_user.username }}
+                </a></p>
+            <a href="/logout" class="btn btn-danger btn-sm ms-1 d-inline"><i class="bi bi-door-open-fill"></i>
+                Wyloguj się</a>
+        </div>
+    </div>
+
+    <div class="modal fade" id="add-website">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Dodaj stronę</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="website-name" class="form-label">Nazwa</label>
+                        <input type="text" class="form-control" id="website-name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="website-domain" class="form-label">Domena</label>
+                        <input type="text" class="form-control" id="website-domain">
+                    </div>
+                    <div class="mb-3">
+                        <label for="pythonanywhere-host" class="form-label">Host PythonAnywhere</label>
+                        <input type="text" class="form-control" id="pythonanywhere-host">
+                    </div>
+                    <div class="mb-3">
+                        <label for="pythonanywhere-username" class="form-label">Nazwa użytkownika PythonAnywhere</label>
+                        <input type="text" class="form-control" id="pythonanywhere-username">
+                    </div>
+                    <div class="mb-3">
+                        <label for="pythonanywhere-api-token" class="form-label">Token API PythonAnywhere</label>
+                        <input type="text" class="form-control" id="pythonanywhere-api-token">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i> Anuluj
+                    </button>
+                    <button type="button" class="btn btn-success" id="add-site-confirm">
+                        <i class="bi bi-plus-lg"></i> Dodaj
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="admin-panel-info">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Informacje o panelu administratora</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="fs-3 text-light-emphasis"><b>Panel administratora</b></p>
+
+                    <div class="nav nav-tabs mb-1">
+                        <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info"
+                            type="button" role="tab">Informacje</button>
+                        <button class="nav-link" id="libraries-tab" data-bs-toggle="tab" data-bs-target="#libraries"
+                            type="button" role="tab">Biblioteki</button>
+                    </div>
+
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="info" role="tabpanel">
+                            <a href="https://github.com/slonindyjski/AdminPanel" target="_blank" rel="noopener">Repozytorium GitHub</a>
+
+                            <p class="fs-3 text-light-emphasis"><b>Wersja</b></p>
+                            <p><b>Wersja:</b> {{ version['version'] }}</p>
+                            <p><b>Build:</b> {{ version['build'] }}</p>
+                            {% if version['dev'] %}
+                            <p><b>DEV</b></p>
+                            {% endif %}
+
+                            <p class="fs-3 text-light-emphasis"><b>Autor</b></p>
+                            <div class="container-fluid">
+                                <div class="row row-cols-auto">
+                                    <div class="col">
+                                        <img class="img-fluid profile-picture"
+                                            src="/static/img/slon_zwierze_szary_2.jpg" height="150px" width="150px"
+                                            alt="Zdjęcie profilowe">
+                                    </div>
+                                    <div class="col">
+                                        <p class="fs-3 text-light-emphasis fw-medium">Słoń Indyjski</p>
+
+                                        <a href="https://iledodniaslonia.pythonanywhere.com/"
+                                            class="social-link elephant-countdown-link" target="_blank"
+                                            title="Odliczanie do Dnia Słonia" rel="noopener">
+                                            <i class="ei-elephant"></i>
+                                        </a>
+                                        <a href="https://slonindyjski.pythonanywhere.com/" class="social-link site-link"
+                                            target="_blank" title="Strona internetowa" rel="noopener">
+                                            <i class="bi bi-globe"></i>
+                                        </a>
+                                        <a href="https://www.youtube.com/@slon_indyjski"
+                                            class="social-link youtube-link" target="_blank" title="Kanał YouTube"
+                                            rel="noopener">
+                                            <i class="bi bi-youtube"></i>
+                                        </a>
+                                        <a href="https://github.com/slonindyjski"
+                                            class="social-link github-link" target="_blank" title="Profil GitHub"
+                                            rel="noopener">
+                                            <i class="bi bi-github"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="libraries" role="tabpanel">
+                            <p class="fs-3 text-light-emphasis"><b>Użyte biblioteki itp.:</b></p>
+                            <p class="fs-5">Front-end:</p>
+                            <ul>
+                                <li><a href="https://getbootstrap.com/" target="_blank" rel="noopener">Bootstrap</a></li>
+                                <li><a href="https://icons.getbootstrap.com/" target="_blank" rel="noopener">Bootstrap Icons</a></li>
+                                <li><a href="https://github.com/brix/crypto-js" target="_blank" rel="noopener">crypto-js</a></li>
+                                <li><a href="https://www.jsdelivr.com/" target="_blank" rel="noopener">jsDelivr</a></li>
+                                <li><a href="https://pl.gravatar.com/" target="_blank" rel="noopener">Gravatar</a></li>
+                            </ul>
+                            <p class="fs-5">Back-end:</p>
+                            <ul>
+                                <li><a href="https://palletsprojects.com/p/flask" target="_blank" rel="noopener">Flask</a></li>
+                                <li><a href="https://github.com/maxcountryman/flask-login" target="_blank" rel="noopener">Flask Login</a></li>
+                                <li><a href="https://dev.mysql.com/doc/connector-python/en/index.html" target="_blank" rel="noopener">Mysql Connector Python</a></li>
+                                <li><a href="https://requests.readthedocs.io" target="_blank" rel="noopener">requests</a></li>
+                                <li><a href="https://github.com/pyotp/pyotp" target="_blank" rel="noopener">PyOTP</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i> Zamknij
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid m-0 p-2">
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#add-website">
+            <i class="bi bi-plus-lg"></i> Dodaj stronę
+        </button>
+        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#admin-panel-info">
+            <i class="bi bi-info-circle-fill"></i> Informacje o panelu
+        </button>
+
+        {% for site in sites %}
+        <div class="website container-fluid mt-2 pt-2 pb-3">
+            <div class="row">
+                <div class="col-auto">
+                    <img src="https://{{ site.domain }}/favicon.ico" alt="Ikona strony {{ site.name }}" width="128px"
+                        height="128px">
+                </div>
+                <div class="col-auto">
+                    <div class="fs-3 text-light-emphasis">{{ site.name }}</div>
+                    <div class="fs-6">{{ site.domain }}</div>
+                    <a href="/websites/{{ site.website_id }}/" class="btn btn-primary mt-2"><i
+                            class="bi bi-box-arrow-up-right"></i> Przejdź</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        document.querySelector('#add-site-confirm').addEventListener('click', () => {
+            document.querySelector('#add-site-confirm').innerHTML = `
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="visually-hidden">Loading...</span>
+            `;
+            document.querySelector('#add-site-confirm').disabled = true;
+            fetch('/websites', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: document.querySelector('#website-name').value,
+                    domain: document.querySelector('#website-domain').value,
+                    pythonanywhere_host: document.querySelector('#pythonanywhere-host').value,
+                    pythonanywhere_username: document.querySelector('#pythonanywhere-username').value,
+                    pythonanywhere_api_token: document.querySelector('#pythonanywhere-api-token').value
+                })
+            })
+                .then(function (response) { return response.json(); })
+                .then(function (json) {
+                    if (json.status == 'ok') {
+                        window.location.replace('/')
+                    }
+                })
+
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moje konto</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <link rel="manifest" href="/manifest.json">
+
+    <meta name="theme-color" content="#0d6efd" />
+
+    <meta name="robots" content="noindex">
+
+    <link rel="apple-touch-icon" href="/static/img/maskable_icons/maskable_icon_x192.png" />
+
+    <script>
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.querySelector('html').setAttribute('data-bs-theme', 'dark');
+        }
+    </script>
+</head>
+
+<body class="body-margin">
+    <div class="bg-primary text-white p-1 menu">
+        <div class="float-start mt-1 ms-1">
+            <a href="/">
+                <svg id="main-site-link-icon" fill="white" height="35px" width="35px"></svg>
+            </a>
+            <script>
+                fetch('/static/img/admin_icon2.txt')
+                    .then(function (response) { return response.text(); })
+                    .then(function (r) {
+                        document.querySelector('#main-site-link-icon').innerHTML = r;
+                    });
+            </script>
+        </div>
+        <div class="profile-info">
+            <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/core.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/md5.js"></script>
+            <img id="profile-picture" class="d-inline" alt="Zdjęcie profilowe">
+            <script>
+                document.querySelector('#profile-picture').src = `https://www.gravatar.com/avatar/${CryptoJS.MD5('{{ current_user.email }}')}?d=mp`;
+            </script>
+            <p class="d-inline fs-5 ms-1"><a href="/account" class="link-body-emphasis link-underline-opacity-0">
+                    {{ current_user.username }}
+                </a></p>
+            <a href="/logout" class="btn btn-danger btn-sm ms-1 d-inline"><i class="bi bi-door-open-fill"></i>
+                Wyloguj się</a>
+        </div>
+    </div>
+
+    <div class="container-fluid m-0 p-0 mt-3">
+        <div class="row m-0">
+            <div class="col">
+                <img id="profile-picture-large" class="img-fluid" alt="Zdjęcie profilowe">
+                <script>
+                    document.querySelector('#profile-picture-large').src = `https://www.gravatar.com/avatar/${CryptoJS.MD5('{{ current_user.email }}')}?d=mp&s=256`;
+                </script>
+                <p class="fs-3">{{ current_user.full_name }}</p>
+            </div>
+        </div>
+        <div class="row m-0 mt-3">
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+                <div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nazwa użytkownika</label>
+                        <input type="text" class="form-control" id="username" autocomplete="off"
+                            value="{{ current_user.username }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="full-name" class="form-label">Pełna nazwa</label>
+                        <input type="text" class="form-control" id="full-name" autocomplete="off"
+                            value="{{ current_user.full_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">E-mail</label>
+                        <input type="email" class="form-control" id="email" value="{{ current_user.email }}">
+                    </div>
+                    <button id="change-profile-details" class="btn btn-primary"><i class="bi bi-pencil-fill"></i>
+                        Zapisz</button>
+                    <a href="https://gravatar.com/emails/" class="btn btn-secondary" target="_blank"
+                        rel="noopener"><i class="bi bi-person-circle"></i>
+                        Zmień zdjęcie profilowe na Gravatarze</a>
+                </div>
+            </div>
+            <div
+                class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6 mt-3 mt-sm-3 mt-md-0 mt-lg-0 mt-xl-0 mt-xxl-0">
+                <div>
+                    <div id="bad-passwords" class="alert alert-danger d-none" role="alert">
+                        Hasła nie są takie same!
+                    </div>
+                    <div class="mb-3">
+                        <label for="new-password" class="form-label">Nowe hasło</label>
+                        <input type="password" class="form-control" id="new-password" autocomplete="new-password">
+                    </div>
+                    <div class="mb-3">
+                        <label for="retype-password" class="form-label">Powtórz hasło</label>
+                        <input type="password" class="form-control" id="retype-password" autocomplete="new-password">
+                    </div>
+                    <button id="change-password" class="btn btn-primary">
+                        <i class="bi bi-pencil-fill"></i> Zmień hasło
+                    </button>
+                </div>
+                <div class="mt-3">
+                    <button id="enable-2fa" class="btn btn-success d-none" data-bs-toggle="modal"
+                        data-bs-target="#enable-2fa-modal">Włącz 2FA</button>
+                    <button id="disable-2fa" class="btn btn-danger d-none" data-bs-toggle="modal"
+                        data-bs-target="#disable-2fa-modal">Wyłącz 2FA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="enable-2fa-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Włącz 2FA</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="bad-otp" class="alert alert-danger d-none" role="alert">
+                        Błędny kod OTP (2FA)!
+                    </div>
+                    <div id="qrcode-2fa"></div>
+                    <div class="mb-3 mt-3">
+                        <label for="secret-2fa" class="form-label">Klucz tajny</label>
+                        <input type="text" class="form-control" id="secret-2fa" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="otp" class="form-label">Kod OTP (2FA)</label>
+                        <input type="text" class="form-control" id="otp">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i> Anuluj
+                    </button>
+                    <button type="button" class="btn btn-success" id="enable-2fa-confirm">
+                        <i class="bi bi-check-lg"></i> Włącz
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="disable-2fa-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Wyłącz 2FA</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Czy na pewno chcesz wyłączyć weryfikację dwuskładnikową?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i> Anuluj
+                    </button>
+                    <button type="button" class="btn btn-danger" id="disable-2fa-confirm">
+                        <i class="bi bi-check-lg"></i> Wyłącz
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        function randomString(length) {
+            let result = '';
+            const characters = 'abcdefghijklmnopqrstuvwxyz234567';
+            const charactersLength = characters.length;
+            let counter = 0;
+            while (counter < length) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                counter += 1;
+            }
+            return result;
+        }
+        document.querySelector('#change-profile-details').addEventListener('click', () => {
+            if (document.querySelector('#username').value != '' && document.querySelector('#full-name').value != '' && document.querySelector('#email').value != '') {
+                document.querySelector('#change-profile-details').innerHTML = `
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span class="visually-hidden">Loading...</span>
+                `;
+                document.querySelector('#change-profile-details').disabled = true;
+                fetch('/edit_profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: document.querySelector('#username').value, full_name: document.querySelector('#full-name').value, email: document.querySelector('#email').value })
+                })
+                    .then(function (response) { return response.json(); })
+                    .then(function (json) {
+                        if (json.status == 'ok') {
+                            window.location.replace('/account')
+                        }
+                    })
+            }
+        });
+        document.querySelector('#change-password').addEventListener('click', () => {
+            if (document.querySelector('#new-password').value == document.querySelector('#retype-password').value) {
+                if (document.querySelector('#new-password').value != '') {
+                    document.querySelector('#change-password').innerHTML = `
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span class="visually-hidden">Loading...</span>
+                    `;
+                    document.querySelector('#change-password').disabled = true;
+                    fetch('/change_password', {
+                        method: 'PUT',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ password: document.querySelector('#new-password').value })
+                    })
+                        .then(function (response) { return response.json(); })
+                        .then(function (json) {
+                            if (json.status == 'ok') {
+                                window.location.replace('/account')
+                            }
+                        })
+                }
+            } else {
+                document.querySelector('#bad-passwords').classList.remove('d-none');
+                document.querySelector('#change-password').innerHTML = '<i class="bi bi-pencil-fill"></i> Zmień hasło</button>';
+                document.querySelector('#change-password').disabled = false;
+            }
+        });
+        fetch('/2fa')
+            .then(function (response) { return response.json(); })
+            .then(function (json) {
+                if (json.status == 'enabled') {
+                    document.querySelector('#disable-2fa').classList.remove('d-none');
+                } else {
+                    document.querySelector('#enable-2fa').classList.remove('d-none');
+                }
+            })
+        var secret2fa = randomString(16);
+        document.querySelector('#secret-2fa').value = secret2fa;
+        new QRCode(document.querySelector('#qrcode-2fa'), `otpauth://totp/{{ current_user.username }}?secret=${ secret2fa }&issuer=Slon%20Admin%20Panel`)
+        document.querySelector('#enable-2fa-confirm').addEventListener('click', () => {
+            if (document.querySelector('#otp').value != '') {
+                document.querySelector('#enable-2fa-confirm').innerHTML = `
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span class="visually-hidden">Loading...</span>
+                `;
+                document.querySelector('#enable-2fa-confirm').disabled = true;
+                fetch('/2fa', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ secret: document.querySelector('#secret-2fa').value, otp: document.querySelector('#otp').value })
+                    })
+                    .then(function (response) { return response.json(); })
+                    .then(function (json) {
+                        if (json.status == 'ok') {
+                            window.location.replace('/account')
+                        } else if (json.status == 'bad_otp') {
+                            document.querySelector('#bad-otp').classList.remove('d-none');
+                            document.querySelector('#enable-2fa-confirm').innerHTML = '<i class="bi bi-check-lg"></i> Włącz';
+                            document.querySelector('#enable-2fa-confirm').disabled = false;
+                        }
+                    })
+            }
+        });
+        document.querySelector('#disable-2fa-confirm').addEventListener('click', () => {
+            document.querySelector('#disable-2fa-confirm').innerHTML = `
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="visually-hidden">Loading...</span>
+            `;
+            document.querySelector('#disable-2fa-confirm').disabled = true;
+            fetch('/2fa', { method: 'DELETE' })
+                .then(function (response) { return response.json(); })
+                .then(function (json) {
+                    if (json.status == 'ok') {
+                        window.location.replace('/account')
+                    }
+                })
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+</body>
+
+</html>

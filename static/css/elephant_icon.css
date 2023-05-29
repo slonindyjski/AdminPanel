@@ -1,0 +1,30 @@
+@font-face {
+  font-family: 'elephant_icon';
+  src:  url('/static/fonts/elephant_icon.eot?tv1jyx');
+  src:  url('/static/fonts/elephant_icon.eot?tv1jyx#iefix') format('embedded-opentype'),
+    url('/static/fonts/elephant_icon.ttf?tv1jyx') format('truetype'),
+    url('/static/fonts/elephant_icon.woff?tv1jyx') format('woff'),
+    url('/static/fonts/elephant_icon.svg?tv1jyx#elephant_icon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="ei-"], [class*=" ei-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'elephant_icon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ei-elephant:before {
+  content: "\e900";
+}

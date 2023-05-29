@@ -1,0 +1,137 @@
+@font-face {
+    font-family: consolas;
+    src: url(/static/fonts/consolas.ttf);
+}
+
+@font-face {
+    font-family: consolas;
+    src: url(/static/fonts/consolas_bold.ttf);
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: consolas;
+    src: url(/static/fonts/consolas_italic.ttf);
+    font-style: italic;
+}
+
+@font-face {
+    font-family: consolas;
+    src: url(/static/fonts/consolas_bold_italic.ttf);
+    font-weight: bold;
+    font-style: italic;
+}
+
+.menu {
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    z-index: 2;
+}
+
+.body-margin {
+    margin-top: 50px;
+}
+
+.login-div {
+    width: 500px;
+    max-width: calc(100% - 10px);
+    height: fit-content;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #888888;
+    border-radius: 10px;
+    padding: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+}
+
+#profile-picture {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+}
+
+.profile-info {
+    margin-left: auto;
+    width: fit-content;
+}
+
+#profile-picture-large {
+    border-radius: 50%;
+    border-style: solid;
+    border-width: 1px;
+}
+
+#qrcode-2fa {
+    width: fit-content;
+    border-width: 10px;
+    border-color: white;
+    border-style: solid;
+}
+
+.website {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #888888;
+    border-radius: 10px;
+}
+
+.profile-picture {
+    border-radius: 50%;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.social-link {
+    font-size: 30px;
+    color: var(--bs-heading-color);
+    text-decoration: none;
+}
+
+.elephant-countdown-link:hover {
+    color: #6c6cff !important;
+}
+
+.site-link:hover {
+    color: #4f4fff !important;
+}
+
+.youtube-link:hover {
+    color: #f00 !important;
+}
+
+.github-link:hover {
+    color: #505050 !important;
+}
+
+#logs {
+    overflow: auto;
+}
+
+.logs-line {
+    display: inline-flex;
+    color: white;
+}
+
+.logs-line-text {
+    font-family: consolas;
+    padding-left: 4px;
+}
+
+.logs-line-even-number {
+    background-color: #777777;
+}
+
+.logs-line-odd-number {
+    background-color: #666666;
+}
+
+.logs-line-number {
+    font-family: consolas;
+    background-color: #474747;
+    padding-left: 4px;
+    position: absolute;
+    height: 3ch;
+}

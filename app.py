@@ -35,7 +35,7 @@ class User(UserMixin):
         return str(self.user_id) + '+' + self.password
 
     def check_password(self, password):
-        return str(hashlib.sha512(password.encode('UTF-8'))
+        return str(hashlib.sha256(password.encode('UTF-8'))
                    .hexdigest()).lower() == self.password
 
     def check_otp(self, otp):
@@ -45,8 +45,8 @@ class User(UserMixin):
     def edit(self, username, full_name, email):
         db = mysql.connector.connect(**configs['database'])
         cursor = db.cursor()
-        sql = f'UPDATE users SET username = "{username}", full_name = "{full_name}", email = "{email}" WHERE id = "{self.user_id}"'
-        cursor.execute(sql)
+        sql = 'UPDATE users SET username = %s, full_name = %s, email = %s WHERE id = %s'
+        cursor.execute(sql, (username, full_name, email, self.user_id))
         db.commit()
         cursor.close()
         db.close()
@@ -54,10 +54,10 @@ class User(UserMixin):
     def change_password(self, password):
         db = mysql.connector.connect(**configs['database'])
         cursor = db.cursor()
-        password = str(hashlib.sha512(
+        password = str(hashlib.sha256(
             password.encode('UTF-8')).hexdigest()).lower()
-        sql = f'UPDATE users SET password = "{password}" WHERE id = "{self.user_id}"'
-        cursor.execute(sql)
+        sql = 'UPDATE users SET password = %s WHERE id = %s'
+        cursor.execute(sql, (password, self.user_id))
         db.commit()
         cursor.close()
         db.close()
@@ -65,8 +65,8 @@ class User(UserMixin):
     def enable_2fa(self, secret):
         db = mysql.connector.connect(**configs['database'])
         cursor = db.cursor()
-        sql = f'UPDATE users SET secret_2fa = "{secret}" WHERE id = "{self.user_id}"'
-        cursor.execute(sql)
+        sql = 'UPDATE users SET secret_2fa = %s WHERE id = %s'
+        cursor.execute(sql, (secret, self.user_id))
         db.commit()
         cursor.close()
         db.close()
@@ -74,8 +74,8 @@ class User(UserMixin):
     def disable_2fa(self):
         db = mysql.connector.connect(**configs['database'])
         cursor = db.cursor()
-        sql = f'UPDATE users SET secret_2fa = NULL WHERE id = "{self.user_id}"'
-        cursor.execute(sql)
+        sql = 'UPDATE users SET secret_2fa = NULL WHERE id = %s'
+        cursor.execute(sql, (self.user_id, ))
         db.commit()
         cursor.close()
         db.close()
@@ -133,8 +133,9 @@ class Website:
     def edit(self, name, domain, pythonanywhere_host, pythonanywhere_username, pythonanywhere_api_token):
         db = mysql.connector.connect(**configs['database'])
         cursor = db.cursor()
-        sql = f'UPDATE websites SET name = "{name}", domain = "{domain}", pythonanywhere_host = "{pythonanywhere_host}", pythonanywhere_username = "{pythonanywhere_username}", pythonanywhere_api_token = "{pythonanywhere_api_token}" WHERE id = {self.website_id}'
-        cursor.execute(sql)
+        sql = 'UPDATE websites SET name = %s, domain = %s, pythonanywhere_host = %s, pythonanywhere_username = %s, pythonanywhere_api_token = %s WHERE id = %s'
+        cursor.execute(sql, (name, domain, pythonanywhere_host,
+                       pythonanywhere_username, pythonanywhere_api_token, self.website_id))
         db.commit()
         cursor.close()
         db.close()
@@ -142,8 +143,8 @@ class Website:
     def delete(self):
         db = mysql.connector.connect(**configs['database'])
         cursor = db.cursor()
-        sql = f'DELETE FROM websites WHERE id = {self.website_id}'
-        cursor.execute(sql)
+        sql = 'DELETE FROM websites WHERE id = %s'
+        cursor.execute(sql, (self.website_id, ))
         db.commit()
         cursor.close()
         db.close()
@@ -178,9 +179,10 @@ def get_user(user_id=None, username=None):
     db = mysql.connector.connect(**configs['database'])
     cursor = db.cursor(dictionary=True)
     if user_id is not None:
-        cursor.execute(f'SELECT * FROM users WHERE id = "{user_id}"')
+        cursor.execute('SELECT * FROM users WHERE id = %s', (user_id, ))
     elif username is not None:
-        cursor.execute(f'SELECT * FROM users WHERE username = "{username}"')
+        cursor.execute(
+            'SELECT * FROM users WHERE username = %s', (username, ))
     result = cursor.fetchall()
     cursor.close()
     db.close()
@@ -198,8 +200,9 @@ def get_user(user_id=None, username=None):
 def create_website(website):
     db = mysql.connector.connect(**configs['database'])
     cursor = db.cursor()
-    sql = f'INSERT INTO websites VALUES (NULL, {website.user.user_id}, "{website.name}", "{website.domain}", "{website.pythonanywhere_host}", "{website.pythonanywhere_username}", "{website.pythonanywhere_api_token}")'
-    cursor.execute(sql)
+    sql = 'INSERT INTO websites VALUES (NULL, %s, %s, %s, %s, %s, %s)'
+    cursor.execute(sql, (website.user.user_id, website.name, website.domain,
+                   website.pythonanywhere_host, website.pythonanywhere_username, website.pythonanywhere_api_token))
     db.commit()
     cursor.close()
     db.close()
@@ -208,7 +211,8 @@ def create_website(website):
 def get_user_websites(user):
     db = mysql.connector.connect(**configs['database'])
     cursor = db.cursor(dictionary=True)
-    cursor.execute(f'SELECT * FROM websites WHERE user_id = {user.user_id}')
+    cursor.execute('SELECT * FROM websites WHERE user_id = %s',
+                   (user.user_id, ))
     result = cursor.fetchall()
     cursor.close()
     db.close()
@@ -219,7 +223,7 @@ def get_website(user, website_id):
     db = mysql.connector.connect(**configs['database'])
     cursor = db.cursor(dictionary=True)
     cursor.execute(
-        f'SELECT * FROM websites WHERE user_id = {user.user_id} AND id = {website_id}')
+        'SELECT * FROM websites WHERE user_id = %s AND id = %s', (user.user_id, website_id))
     result = cursor.fetchall()
     cursor.close()
     db.close()
@@ -524,6 +528,4 @@ def unauthorized(e):
 
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1',
-            port=5000,
-            debug=True)
+    app.run(**configs['flask_server'])

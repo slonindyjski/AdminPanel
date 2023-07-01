@@ -19,7 +19,7 @@ Panel służy do zarządzania stronami na platformie [PythonAnywhere](https://ww
 1. Do uruchomienia panelu wymagany jest Python w wersji 3 oraz MySQL.
 2. Sklonuj kod panelu oraz przejdź do folderu, do którego został on sklonowany.
 ```bash
-git clone https://github.com/slonindyjski/AdminPanel.git
+git clone https://github.com/barteklorenc/AdminPanel.git
 cd AdminPanel
 ```
 3. Zainstaluj wymagane biblioteki Python.
